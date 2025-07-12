@@ -1,0 +1,257 @@
+### Variables de entorno
+@baseUrl = http://localhost:3001
+@adminToken = {{loginAdmin.response.body.data.token}}
+@userToken = {{loginUser.response.body.data.token}}
+
+### ========================================
+### AUTENTICACIÓN
+### ========================================
+
+# Login como administrador
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@medusa.com",
+  "password": "admin123456"
+}
+
+###
+
+# Login como usuario normal
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@example.com",
+  "password": "123456"
+}
+
+### ========================================
+### FLUJO NORMAL DE USUARIO (SIN ADMIN)
+### ========================================
+
+# 1. Obtener mi carrito (se crea automáticamente si no existe)
+GET {{baseUrl}}/cart/my-cart
+Authorization: Bearer {{userToken}}
+
+###
+
+# 2. Agregar iPhone al carrito
+POST {{baseUrl}}/cart/my-cart/items
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "productId": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "quantity": 2
+}
+
+###
+
+# 3. Agregar MacBook al carrito
+POST {{baseUrl}}/cart/my-cart/items
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "productId": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "quantity": 1
+}
+
+###
+
+# 4. Ver resumen del carrito
+GET {{baseUrl}}/cart/my-cart/summary
+Authorization: Bearer {{userToken}}
+
+###
+
+# 5. Calcular totales
+GET {{baseUrl}}/cart/my-cart/totals
+Authorization: Bearer {{userToken}}
+
+###
+
+# 6. Verificar disponibilidad
+GET {{baseUrl}}/cart/my-cart/availability
+Authorization: Bearer {{userToken}}
+
+###
+
+# 7. Actualizar cantidad de iPhone
+PUT {{baseUrl}}/cart/my-cart/items/64f1a2b3c4d5e6f7g8h9i0j1
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "quantity": 3
+}
+
+###
+
+# 8. Ver carrito actualizado
+GET {{baseUrl}}/cart/my-cart
+Authorization: Bearer {{userToken}}
+
+###
+
+# 9. Remover MacBook del carrito
+DELETE {{baseUrl}}/cart/my-cart/items/64f1a2b3c4d5e6f7g8h9i0j2
+Authorization: Bearer {{userToken}}
+
+###
+
+# 10. Limpiar carrito completo
+DELETE {{baseUrl}}/cart/my-cart/clear
+Authorization: Bearer {{userToken}}
+
+###
+
+# 11. Verificar que el carrito está vacío
+GET {{baseUrl}}/cart/my-cart
+Authorization: Bearer {{userToken}}
+
+### ========================================
+### RUTAS PÚBLICAS (PARA VISITANTES)
+### ========================================
+
+# Obtener carrito por userId
+GET {{baseUrl}}/cart/public?userId=64f1a2b3c4d5e6f7g8h9i0j1
+
+###
+
+# Obtener carrito por visitorId
+GET {{baseUrl}}/cart/public?visitorId=visitor_123456
+
+### ========================================
+### RUTAS DE ADMINISTRADOR (GESTIÓN)
+### ========================================
+
+# Crear carrito para usuario específico (ADMIN)
+POST {{baseUrl}}/cart
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "userId": "64f1a2b3c4d5e6f7g8h9i0j1"
+}
+
+###
+
+# Crear carrito para visitante (ADMIN)
+POST {{baseUrl}}/cart
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "visitorId": "visitor_123456"
+}
+
+###
+
+# Obtener todos los carritos (ADMIN)
+GET {{baseUrl}}/cart/admin?page=1&limit=10&hasItems=true
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Obtener carrito específico (ADMIN)
+GET {{baseUrl}}/cart/admin/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Agregar producto a carrito específico (ADMIN)
+POST {{baseUrl}}/cart/admin/64f1a2b3c4d5e6f7g8h9i0j1/items
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "productId": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "quantity": 1
+}
+
+###
+
+# Ver resumen de carrito específico (ADMIN)
+GET {{baseUrl}}/cart/admin/64f1a2b3c4d5e6f7g8h9i0j1/summary
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Eliminar carrito específico (ADMIN)
+DELETE {{baseUrl}}/cart/admin/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### CASOS DE PRUEBA Y ERRORES
+### ========================================
+
+# Intentar agregar producto sin stock
+POST {{baseUrl}}/cart/my-cart/items
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "productId": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "quantity": 999
+}
+
+###
+
+# Intentar agregar producto inexistente
+POST {{baseUrl}}/cart/my-cart/items
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "productId": "64f1a2b3c4d5e6f7g8h9i0j9",
+  "quantity": 1
+}
+
+###
+
+# Intentar actualizar cantidad a 0 (debería remover el item)
+PUT {{baseUrl}}/cart/my-cart/items/64f1a2b3c4d5e6f7g8h9i0j1
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "quantity": 0
+}
+
+###
+
+# Intentar acceder sin autenticación
+GET {{baseUrl}}/cart/my-cart
+
+###
+
+# Intentar acceder a rutas de admin sin ser admin
+GET {{baseUrl}}/cart/admin
+Authorization: Bearer {{userToken}}
+
+### ========================================
+### NOTAS IMPORTANTES
+### ========================================
+
+# FLUJO NORMAL PARA USUARIOS:
+# 1. GET /cart/my-cart - Obtiene o crea automáticamente el carrito
+# 2. POST /cart/my-cart/items - Agrega productos
+# 3. PUT /cart/my-cart/items/:productId - Actualiza cantidades
+# 4. DELETE /cart/my-cart/items/:productId - Remueve productos
+# 5. GET /cart/my-cart/summary - Ve resumen completo
+# 6. DELETE /cart/my-cart/clear - Limpia el carrito
+
+# FLUJO PARA VISITANTES:
+# 1. GET /cart/public?visitorId=xxx - Obtiene carrito por visitorId
+# 2. Los visitantes no pueden modificar carritos (solo ver)
+
+# FLUJO PARA ADMINISTRADORES:
+# 1. POST /cart - Crea carritos para usuarios/visitantes
+# 2. GET /cart/admin - Ve todos los carritos
+# 3. GET /cart/admin/:cartId - Ve carrito específico
+# 4. Puede gestionar cualquier carrito del sistema 

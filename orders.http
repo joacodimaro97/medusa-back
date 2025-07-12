@@ -1,0 +1,317 @@
+### Variables de entorno
+@baseUrl = http://localhost:3001
+@adminToken = {{adminLogin.response.body.token}}
+@userToken = {{userLogin.response.body.token}}
+
+### ========================================
+### AUTENTICACIÓN
+### ========================================
+
+### Login como admin
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@medusa.com",
+  "password": "admin123"
+}
+
+### Login como usuario
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@example.com",
+  "password": "123456"
+}
+
+### ========================================
+### CRUD BÁSICO DE PEDIDOS
+### ========================================
+
+### Crear pedido (guest checkout)
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "email": "guest@example.com",
+  "shippingAddress": {
+    "street": "Calle Principal 123",
+    "city": "Buenos Aires",
+    "province": "Buenos Aires",
+    "country": "Argentina",
+    "zip": "1001"
+  },
+  "items": [
+    {
+      "productId": "{{$randomUUID}}",
+      "quantity": 2,
+      "priceAtPurchase": 29.99
+    }
+  ]
+}
+
+### Crear pedido desde carrito (usuario autenticado)
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "email": "juan@example.com",
+  "shippingAddress": {
+    "street": "Avenida Libertador 456",
+    "city": "Córdoba",
+    "province": "Córdoba",
+    "country": "Argentina",
+    "zip": "5000"
+  },
+  "cartId": "{{$randomUUID}}"
+}
+
+### Obtener pedidos del usuario
+GET {{baseUrl}}/orders
+Authorization: Bearer {{userToken}}
+
+### Obtener pedido específico del usuario
+GET {{baseUrl}}/orders/{{$randomUUID}}
+Authorization: Bearer {{userToken}}
+
+### Obtener todos los pedidos (admin)
+GET {{baseUrl}}/orders/admin/all
+Authorization: Bearer {{adminToken}}
+
+### Obtener todos los pedidos con filtros (admin)
+GET {{baseUrl}}/orders/admin/all?status=paid&page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+### Actualizar pedido (admin)
+PUT {{baseUrl}}/orders/{{$randomUUID}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "shippingAddress": {
+    "street": "Nueva Calle 789",
+    "city": "Rosario",
+    "province": "Santa Fe",
+    "country": "Argentina",
+    "zip": "2000"
+  }
+}
+
+### Eliminar pedido (admin)
+DELETE {{baseUrl}}/orders/{{$randomUUID}}
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### GESTIÓN DE PAGOS (Admin)
+### ========================================
+
+### Actualizar estado de pago
+PATCH {{baseUrl}}/orders/{{$randomUUID}}/payment
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "paymentStatus": "paid",
+  "paymentProvider": "stripe"
+}
+
+### Obtener pedidos por estado de pago
+GET {{baseUrl}}/orders/payment/paid
+Authorization: Bearer {{adminToken}}
+
+### Obtener pedidos pendientes de pago
+GET {{baseUrl}}/orders/payment/pending
+Authorization: Bearer {{adminToken}}
+
+### Obtener estadísticas de pagos
+GET {{baseUrl}}/orders/payment/stats
+Authorization: Bearer {{adminToken}}
+
+### Obtener estadísticas de pagos por período
+GET {{baseUrl}}/orders/payment/stats?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### GESTIÓN DE ENVÍOS (Admin)
+### ========================================
+
+### Actualizar estado de envío
+PATCH {{baseUrl}}/orders/{{$randomUUID}}/shipping
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "shippingStatus": "shipped",
+  "trackingNumber": "TRK123456789"
+}
+
+### Obtener pedidos por estado de envío
+GET {{baseUrl}}/orders/shipping/shipped
+Authorization: Bearer {{adminToken}}
+
+### Obtener pedidos entregados
+GET {{baseUrl}}/orders/shipping/delivered
+Authorization: Bearer {{adminToken}}
+
+### Obtener estadísticas de envíos
+GET {{baseUrl}}/orders/shipping/stats
+Authorization: Bearer {{adminToken}}
+
+### Obtener pedidos listos para enviar
+GET {{baseUrl}}/orders/shipping/ready
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### ESTADÍSTICAS Y REPORTES (Admin)
+### ========================================
+
+### Obtener estadísticas generales
+GET {{baseUrl}}/orders/stats/overview
+Authorization: Bearer {{adminToken}}
+
+### Obtener estadísticas por período
+GET {{baseUrl}}/orders/stats/period?period=month
+Authorization: Bearer {{adminToken}}
+
+### Obtener estadísticas por día
+GET {{baseUrl}}/orders/stats/period?period=day
+Authorization: Bearer {{adminToken}}
+
+### Obtener productos más vendidos
+GET {{baseUrl}}/orders/stats/top-products?limit=5
+Authorization: Bearer {{adminToken}}
+
+### Obtener productos más vendidos por período
+GET {{baseUrl}}/orders/stats/top-products?limit=10&startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{adminToken}}
+
+### Obtener estadísticas de clientes
+GET {{baseUrl}}/orders/stats/customers
+Authorization: Bearer {{adminToken}}
+
+### Obtener estadísticas de clientes por período
+GET {{baseUrl}}/orders/stats/customers?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### EJEMPLOS DE PEDIDOS COMPLETOS
+### ========================================
+
+### Ejemplo 1: Pedido con múltiples productos
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "email": "cliente@example.com",
+  "shippingAddress": {
+    "street": "Calle Comercial 100",
+    "city": "Mendoza",
+    "province": "Mendoza",
+    "country": "Argentina",
+    "zip": "5500"
+  },
+  "items": [
+    {
+      "productId": "{{$randomUUID}}",
+      "quantity": 1,
+      "priceAtPurchase": 49.99
+    },
+    {
+      "productId": "{{$randomUUID}}",
+      "quantity": 3,
+      "priceAtPurchase": 19.99
+    },
+    {
+      "productId": "{{$randomUUID}}",
+      "quantity": 2,
+      "priceAtPurchase": 34.99
+    }
+  ]
+}
+
+### Ejemplo 2: Pedido con descuento aplicado
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "email": "cliente2@example.com",
+  "shippingAddress": {
+    "street": "Avenida Central 200",
+    "city": "La Plata",
+    "province": "Buenos Aires",
+    "country": "Argentina",
+    "zip": "1900"
+  },
+  "items": [
+    {
+      "productId": "{{$randomUUID}}",
+      "quantity": 1,
+      "priceAtPurchase": 89.99
+    }
+  ],
+  "paymentProvider": "mercadopago"
+}
+
+### ========================================
+### FLUJO COMPLETO DE UN PEDIDO
+### ========================================
+
+### 1. Crear pedido
+# @name createOrder
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "email": "flujo@example.com",
+  "shippingAddress": {
+    "street": "Calle de Prueba 300",
+    "city": "San Miguel de Tucumán",
+    "province": "Tucumán",
+    "country": "Argentina",
+    "zip": "4000"
+  },
+  "items": [
+    {
+      "productId": "{{$randomUUID}}",
+      "quantity": 2,
+      "priceAtPurchase": 25.50
+    }
+  ]
+}
+
+### 2. Marcar como pagado
+PATCH {{baseUrl}}/orders/{{createOrder.response.body.data._id}}/payment
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "paymentStatus": "paid",
+  "paymentProvider": "stripe"
+}
+
+### 3. Marcar como enviado
+PATCH {{baseUrl}}/orders/{{createOrder.response.body.data._id}}/shipping
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "shippingStatus": "shipped",
+  "trackingNumber": "TRK987654321"
+}
+
+### 4. Marcar como entregado
+PATCH {{baseUrl}}/orders/{{createOrder.response.body.data._id}}/shipping
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "shippingStatus": "delivered"
+}
+
+### 5. Ver pedido final
+GET {{baseUrl}}/orders/{{createOrder.response.body.data._id}}
+Authorization: Bearer {{adminToken}} 

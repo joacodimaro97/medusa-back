@@ -1,0 +1,250 @@
+### Variables de entorno para REST Client
+@baseUrl = http://localhost:3001
+@authToken = {{login.response.body.data.token}}
+
+### ========================================
+### AUTENTICACIÓN
+### ========================================
+
+### 1. Registrar nuevo usuario
+# @name register
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Juan Pérez",
+  "email": "juan@example.com",
+  "password": "123456",
+  "phone": "+1234567890",
+  "address": {
+    "street": "Calle Principal 123",
+    "city": "Buenos Aires",
+    "province": "Buenos Aires",
+    "country": "Argentina",
+    "zip": "1001"
+  }
+}
+
+### 2. Login de usuario
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@example.com",
+  "password": "123456"
+}
+
+### ========================================
+### RUTAS PÚBLICAS
+### ========================================
+
+### 3. Crear usuario (público)
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "María García",
+  "email": "maria@example.com",
+  "password": "123456",
+  "phone": "+1234567891",
+  "address": {
+    "street": "Avenida Central 456",
+    "city": "Córdoba",
+    "province": "Córdoba",
+    "country": "Argentina",
+    "zip": "5000"
+  }
+}
+
+### ========================================
+### RUTAS AUTENTICADAS (USUARIO)
+### ========================================
+
+### 4. Obtener perfil del usuario autenticado
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{authToken}}
+
+### 5. Actualizar perfil del usuario
+PUT {{baseUrl}}/users/profile
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Juan Carlos Pérez",
+  "email": "juancarlos@example.com",
+  "phone": "+1234567892",
+  "address": {
+    "street": "Calle Principal 123",
+    "city": "Buenos Aires",
+    "province": "Buenos Aires",
+    "country": "Argentina",
+    "zip": "1001"
+  }
+}
+
+### 6. Cambiar contraseña
+PUT {{baseUrl}}/users/change-password
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "123456",
+  "newPassword": "nueva123456"
+}
+
+### 7. Obtener favoritos del usuario
+GET {{baseUrl}}/users/favorites
+Authorization: Bearer {{authToken}}
+
+### 8. Agregar producto a favoritos
+POST {{baseUrl}}/users/favorites/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{authToken}}
+
+### 9. Remover producto de favoritos
+DELETE {{baseUrl}}/users/favorites/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{authToken}}
+
+### ========================================
+### RUTAS DE ADMINISTRADOR
+### ========================================
+
+### 10. Obtener todos los usuarios (solo admin)
+GET {{baseUrl}}/users?page=1&limit=10&search=juan
+Authorization: Bearer {{authToken}}
+
+### 11. Obtener todos los usuarios sin filtros
+GET {{baseUrl}}/users?page=1&limit=5
+Authorization: Bearer {{authToken}}
+
+### 12. Obtener usuario por ID (solo admin)
+GET {{baseUrl}}/users/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{authToken}}
+
+### 13. Actualizar usuario por ID (solo admin)
+PUT {{baseUrl}}/users/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "María García Actualizada",
+  "email": "maria.actualizada@example.com",
+  "phone": "+1234567893",
+  "address": {
+    "street": "Nueva Calle 789",
+    "city": "Rosario",
+    "province": "Santa Fe",
+    "country": "Argentina",
+    "zip": "2000"
+  },
+  "isAdmin": false
+}
+
+### 14. Hacer usuario administrador
+PUT {{baseUrl}}/users/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "isAdmin": true
+}
+
+### 15. Eliminar usuario por ID (solo admin)
+DELETE {{baseUrl}}/users/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{authToken}}
+
+### ========================================
+### CASOS DE PRUEBA Y ERRORES
+### ========================================
+
+### 16. Intentar crear usuario con email duplicado
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Usuario Duplicado",
+  "email": "juan@example.com",
+  "password": "123456"
+}
+
+### 17. Intentar login con credenciales incorrectas
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@example.com",
+  "password": "password_incorrecto"
+}
+
+### 18. Intentar acceder a ruta protegida sin token
+GET {{baseUrl}}/users/profile
+
+### 19. Intentar acceder a ruta de admin sin ser admin
+GET {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
+
+### 20. Intentar cambiar contraseña con contraseña actual incorrecta
+PUT {{baseUrl}}/users/change-password
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "contraseña_incorrecta",
+  "newPassword": "nueva123456"
+}
+
+### ========================================
+### DATOS DE PRUEBA ADICIONALES
+### ========================================
+
+### 21. Crear usuario administrador
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Admin Principal",
+  "email": "admin@medusa.com",
+  "password": "admin123456",
+  "phone": "+1234567894",
+  "address": {
+    "street": "Calle Admin 1",
+    "city": "Buenos Aires",
+    "province": "Buenos Aires",
+    "country": "Argentina",
+    "zip": "1000"
+  }
+}
+
+### 22. Crear usuario normal
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Cliente Normal",
+  "email": "cliente@example.com",
+  "password": "cliente123",
+  "phone": "+1234567895",
+  "address": {
+    "street": "Calle Cliente 100",
+    "city": "Mendoza",
+    "province": "Mendoza",
+    "country": "Argentina",
+    "zip": "5500"
+  }
+}
+
+### ========================================
+### NOTAS DE USO
+### ========================================
+
+# Para usar este archivo:
+# 1. Asegúrate de que el servidor esté corriendo en localhost:3001
+# 2. Ejecuta primero el registro o login para obtener un token
+# 3. El token se guardará automáticamente en la variable @authToken
+# 4. Usa las rutas protegidas con el token
+# 5. Para rutas de admin, asegúrate de que el usuario sea administrador
+
+# Comandos útiles:
+# - Ctrl+Alt+R: Ejecutar la solicitud actual
+# - Ctrl+Alt+S: Enviar todas las solicitudes
+# - Ctrl+Alt+C: Cancelar solicitudes en curso 

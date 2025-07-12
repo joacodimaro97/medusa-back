@@ -1,0 +1,303 @@
+### Variables de entorno
+@baseUrl = http://localhost:3001
+@adminToken = {{loginAdmin.response.body.data.token}}
+@userToken = {{loginUser.response.body.data.token}}
+
+### ========================================
+### AUTENTICACIÓN
+### ========================================
+
+# Login como administrador
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@medusa.com",
+  "password": "admin123456"
+}
+
+###
+
+# Login como usuario normal
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@medusa.com",
+  "password": "user123"
+}
+
+### ========================================
+### CRUD BÁSICO DE PRODUCTOS
+### ========================================
+
+# Crear nuevo producto (ADMIN)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "iPhone 15 Pro",
+  "description": "El último iPhone con características avanzadas, incluyendo cámara de 48MP y chip A17 Pro",
+  "price": 999.99,
+  "discount": 10,
+  "stock": 50,
+  "category": "6871c9de6186b529aa79cab5",
+  "images": [
+    "https://i.postimg.cc/abc123/iphone15pro.jpg",
+    "https://i.postimg.cc/def456/iphone15pro-back.jpg"
+  ],
+  "isFeatured": true
+}
+
+###
+
+# Obtener todos los productos (PÚBLICO)
+GET {{baseUrl}}/products?page=1&limit=10&search=iphone&minPrice=500&maxPrice=1500&inStock=true&sortBy=price&sortOrder=asc
+
+###
+
+# Obtener producto por ID (PÚBLICO)
+GET {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1
+
+###
+
+# Actualizar producto (ADMIN)
+PUT {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "iPhone 15 Pro Max",
+  "description": "Versión mejorada del iPhone 15 Pro con pantalla más grande",
+  "price": 1199.99,
+  "discount": 15,
+  "stock": 75,
+  "images": [
+    "https://i.postimg.cc/abc123/iphone15promax.jpg",
+    "https://i.postimg.cc/def456/iphone15promax-back.jpg"
+  ]
+}
+
+###
+
+# Eliminar producto (ADMIN)
+DELETE {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### GESTIÓN DE STOCK
+### ========================================
+
+# Actualizar stock - Agregar (ADMIN)
+PUT {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1/stock
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "quantity": 10,
+  "operation": "add"
+}
+
+###
+
+# Actualizar stock - Restar (ADMIN)
+PUT {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1/stock
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "quantity": 5,
+  "operation": "subtract"
+}
+
+###
+
+# Actualizar stock - Establecer (ADMIN)
+PUT {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1/stock
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "quantity": 100,
+  "operation": "set"
+}
+
+###
+
+# Obtener productos con stock bajo (ADMIN)
+GET {{baseUrl}}/products/admin/low-stock?threshold=20&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Obtener productos sin stock (ADMIN)
+GET {{baseUrl}}/products/admin/out-of-stock?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Verificar disponibilidad (PÚBLICO)
+GET {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1/availability?quantity=5
+
+### ========================================
+### GESTIÓN DE DESCUENTOS
+### ========================================
+
+# Aplicar descuento (ADMIN)
+PUT {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1/discount
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "discountPercentage": 25
+}
+
+###
+
+# Remover descuento (ADMIN)
+DELETE {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1/discount
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Obtener productos con descuento (PÚBLICO)
+GET {{baseUrl}}/products/discounted/list?page=1&limit=10&minDiscount=10
+
+###
+
+# Aplicar descuento masivo por categoría (ADMIN)
+POST {{baseUrl}}/products/admin/bulk-discount
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "categoryId": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "discountPercentage": 20
+}
+
+### ========================================
+### PRODUCTOS DESTACADOS
+### ========================================
+
+# Marcar producto como destacado (ADMIN)
+PUT {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1/featured
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Remover producto de destacados (ADMIN)
+DELETE {{baseUrl}}/products/64f1a2b3c4d5e6f7g8h9i0j1/featured
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Obtener productos destacados (PÚBLICO)
+GET {{baseUrl}}/products/featured/list?page=1&limit=10
+
+###
+
+# Marcar múltiples productos como destacados (ADMIN)
+POST {{baseUrl}}/products/admin/bulk-featured
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "productIds": [
+    "64f1a2b3c4d5e6f7g8h9i0j1",
+    "64f1a2b3c4d5e6f7g8h9i0j2",
+    "64f1a2b3c4d5e6f7g8h9i0j3"
+  ]
+}
+
+### ========================================
+### EJEMPLOS DE PRODUCTOS
+### ========================================
+
+# Crear MacBook Pro
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "MacBook Pro 16\"",
+  "description": "Potente laptop para profesionales con chip M2 Pro y 16GB de RAM",
+  "price": 2499.99,
+  "discount": 0,
+  "stock": 25,
+  "category": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "images": [
+    "https://i.postimg.cc/xyz789/macbookpro.jpg"
+  ],
+  "isFeatured": false
+}
+
+###
+
+# Crear AirPods Pro
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "AirPods Pro 2",
+  "description": "Auriculares inalámbricos con cancelación de ruido activa y audio espacial",
+  "price": 249.99,
+  "discount": 15,
+  "stock": 100,
+  "category": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "images": [
+    "https://i.postimg.cc/abc456/airpodspro.jpg",
+    "https://i.postimg.cc/def789/airpodspro-case.jpg"
+  ],
+  "isFeatured": true
+}
+
+###
+
+# Crear iPad Air
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "iPad Air 5",
+  "description": "Tablet versátil con chip M1, perfecta para trabajo y entretenimiento",
+  "price": 599.99,
+  "discount": 10,
+  "stock": 40,
+  "category": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "images": [
+    "https://i.postimg.cc/ghi123/ipadair.jpg"
+  ],
+  "isFeatured": false
+}
+
+### ========================================
+### CONSULTAS AVANZADAS
+### ========================================
+
+# Buscar productos por texto
+GET {{baseUrl}}/products?search=iphone&page=1&limit=5
+
+###
+
+# Filtrar por rango de precios
+GET {{baseUrl}}/products?minPrice=200&maxPrice=800&page=1&limit=10
+
+###
+
+# Ordenar por precio ascendente
+GET {{baseUrl}}/products?sortBy=price&sortOrder=asc&page=1&limit=10
+
+###
+
+# Solo productos con stock
+GET {{baseUrl}}/products?inStock=true&page=1&limit=10
+
+###
+
+# Productos destacados con descuento
+GET {{baseUrl}}/products?isFeatured=true&minPrice=0&maxPrice=1000&page=1&limit=5 

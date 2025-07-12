@@ -1,0 +1,144 @@
+### Variables de entorno
+@baseUrl = http://localhost:3001
+@adminToken = {{loginAdmin.response.body.data.token}}
+
+### ========================================
+### AUTENTICACIÓN
+### ========================================
+
+# Login como administrador
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@medusa.com",
+  "password": "admin123456"
+}
+
+### ========================================
+### CRUD BÁSICO DE CATEGORÍAS
+### ========================================
+
+# Crear categoría "Electrónicos" (ADMIN)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Electrónicos",
+  "description": "Productos electrónicos y tecnológicos"
+}
+
+###
+
+# Crear categoría "Ropa" (ADMIN)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Ropa",
+  "description": "Vestimenta y accesorios"
+}
+
+###
+
+# Crear categoría "Hogar" (ADMIN)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Hogar",
+  "description": "Productos para el hogar y decoración"
+}
+
+###
+
+# Crear categoría "Deportes" (ADMIN)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Deportes",
+  "description": "Equipamiento y ropa deportiva"
+}
+
+###
+
+# Obtener todas las categorías (PÚBLICO)
+GET {{baseUrl}}/categories?page=1&limit=10&search=electrónicos&sortBy=name&sortOrder=asc
+
+###
+
+# Obtener categoría por ID (PÚBLICO)
+GET {{baseUrl}}/categories/[ID_DE_LA_CATEGORIA]
+
+###
+
+# Actualizar categoría (ADMIN)
+PUT {{baseUrl}}/categories/[ID_DE_LA_CATEGORIA]
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Tecnología",
+  "description": "Productos tecnológicos y gadgets modernos"
+}
+
+###
+
+# Eliminar categoría (ADMIN) - Solo si no tiene productos
+DELETE {{baseUrl}}/categories/[ID_DE_LA_CATEGORIA]
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### ESTADÍSTICAS Y ANÁLISIS
+### ========================================
+
+# Obtener categorías principales (PÚBLICO)
+GET {{baseUrl}}/categories/stats/top?limit=5
+
+###
+
+# Obtener estadísticas completas (ADMIN)
+GET {{baseUrl}}/categories/admin/stats
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Obtener categorías vacías (ADMIN)
+GET {{baseUrl}}/categories/admin/empty?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### CASOS DE PRUEBA
+### ========================================
+
+# Intentar crear categoría con nombre duplicado
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Electrónicos",
+  "description": "Categoría duplicada"
+}
+
+###
+
+# Intentar eliminar categoría con productos
+DELETE {{baseUrl}}/categories/[ID_DE_CATEGORIA_CON_PRODUCTOS]
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Buscar categorías por texto
+GET {{baseUrl}}/categories?search=tecnología&page=1&limit=5
+
+###
+
+# Ordenar categorías por número de productos
+GET {{baseUrl}}/categories?sortBy=productCount&sortOrder=desc&page=1&limit=10 
