@@ -25,7 +25,7 @@ import {
   getCustomerStats
 } from '../controllers/orders/index.js';
 
-import {  authenticateToken } from '../middleware/auth.js';
+import { protect as authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 

@@ -9,7 +9,7 @@ import {
   getTopCategories,
   getEmptyCategories
 } from '../controllers/categories/index.js';
-import { authenticateToken, requireAdmin } from '../middleware/auth.js';
+import { protect as authenticateToken, admin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -28,15 +28,16 @@ router.get('/stats/top', getTopCategories);
 
 // ========================================
 // RUTAS DE ADMINISTRADOR
+
 // ========================================
 
 // CRUD básico
-router.post('/', authenticateToken, requireAdmin, createCategory);
-router.put('/:id', authenticateToken, requireAdmin, updateCategory);
-router.delete('/:id', authenticateToken, requireAdmin, deleteCategory);
+router.post('/', authenticateToken, admin, createCategory);
+router.put('/:id', authenticateToken, admin, updateCategory);
+router.delete('/:id', authenticateToken, admin, deleteCategory);
 
 // Estadísticas y análisis
-router.get('/admin/stats', authenticateToken, requireAdmin, getCategoryStats);
-router.get('/admin/empty', authenticateToken, requireAdmin, getEmptyCategories);
+router.get('/admin/stats', authenticateToken, admin, getCategoryStats);
+router.get('/admin/empty', authenticateToken, admin, getEmptyCategories);
 
-export default router; 
+export default router;

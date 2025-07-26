@@ -50,6 +50,12 @@ const productSchema = new mongoose.Schema({
   isFeatured: {
     type: Boolean,
     default: false
+  },
+
+  reviewCount: {
+    type: Number,
+    default: 0,
+    min: [0, 'El conteo de reseñas no puede ser negativo']
   }
 }, {
   timestamps: true

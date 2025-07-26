@@ -34,6 +34,7 @@ import productsRouter from './routes/products.js';
 import categoriesRouter from './routes/categories.js';
 import cartRouter from './routes/cart.js';
 import ordersRouter from './routes/orders.js';
+import reviewsRouter from './routes/reviews.js';
 
 const app = express();
 
@@ -62,6 +63,7 @@ app.use('/products', productsRouter);
 app.use('/categories', categoriesRouter);
 app.use('/cart', cartRouter);
 app.use('/orders', ordersRouter);
+app.use('/reviews', reviewsRouter);
 
 // Middleware de manejo de errores
 app.use((err, req, res, next) => {

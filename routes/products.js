@@ -25,7 +25,7 @@ import {
   getFeaturedProducts,
   markMultipleAsFeatured
 } from '../controllers/products/index.js';
-import { authenticateToken, requireAdmin, optionalAuth } from '../middleware/auth.js';
+import { protect as authenticateToken, admin, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -60,23 +60,23 @@ router.get('/auth/enhanced', optionalAuth, getAllProducts);
 // ========================================
 
 // CRUD básico (solo admin)
-router.post('/', authenticateToken, requireAdmin, createProduct);
-router.put('/:id', authenticateToken, requireAdmin, updateProduct);
-router.delete('/:id', authenticateToken, requireAdmin, deleteProduct);
+router.post('/', authenticateToken, admin, createProduct);
+router.put('/:id', authenticateToken, admin, updateProduct);
+router.delete('/:id', authenticateToken, admin, deleteProduct);
 
 // Gestión de stock (solo admin)
-router.put('/:id/stock', authenticateToken, requireAdmin, updateStock);
-router.get('/admin/low-stock', authenticateToken, requireAdmin, getLowStockProducts);
-router.get('/admin/out-of-stock', authenticateToken, requireAdmin, getOutOfStockProducts);
+router.put('/:id/stock', authenticateToken, admin, updateStock);
+router.get('/admin/low-stock', authenticateToken, admin, getLowStockProducts);
+router.get('/admin/out-of-stock', authenticateToken, admin, getOutOfStockProducts);
 
 // Gestión de descuentos (solo admin)
-router.put('/:id/discount', authenticateToken, requireAdmin, applyDiscount);
-router.delete('/:id/discount', authenticateToken, requireAdmin, removeDiscount);
-router.post('/admin/bulk-discount', authenticateToken, requireAdmin, applyBulkDiscount);
+router.put('/:id/discount', authenticateToken, admin, applyDiscount);
+router.delete('/:id/discount', authenticateToken, admin, removeDiscount);
+router.post('/admin/bulk-discount', authenticateToken, admin, applyBulkDiscount);
 
 // Gestión de productos destacados (solo admin)
-router.put('/:id/featured', authenticateToken, requireAdmin, markAsFeatured);
-router.delete('/:id/featured', authenticateToken, requireAdmin, removeFromFeatured);
-router.post('/admin/bulk-featured', authenticateToken, requireAdmin, markMultipleAsFeatured);
+router.put('/:id/featured', authenticateToken, admin, markAsFeatured);
+router.delete('/:id/featured', authenticateToken, admin, removeFromFeatured);
+router.post('/admin/bulk-featured', authenticateToken, admin, markMultipleAsFeatured);
 
 export default router; 

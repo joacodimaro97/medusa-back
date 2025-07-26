@@ -47,8 +47,8 @@ const authenticateToken = async (req, res, next) => {
 };
 
 // Middleware para verificar rol de administrador
-const requireAdmin = (req, res, next) => {
-  if (!req.user.isAdmin) {
+const admin = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
     return res.status(403).json({ 
       success: false, 
       message: 'Acceso denegado. Se requieren permisos de administrador' 
@@ -79,7 +79,7 @@ const optionalAuth = async (req, res, next) => {
 };
 
 export {
-  authenticateToken,
-  requireAdmin,
+  authenticateToken as protect,
+  admin,
   optionalAuth
 }; 

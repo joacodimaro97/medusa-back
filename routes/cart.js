@@ -26,7 +26,7 @@ import {
   checkCartAvailability,
   checkMyCartAvailability
 } from '../controllers/cart/index.js';
-import { authenticateToken, requireAdmin, optionalAuth } from '../middleware/auth.js';
+import { protect as authenticateToken, admin, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -70,21 +70,21 @@ router.get('/my-cart/availability', authenticateToken, checkMyCartAvailability);
 // ========================================
 
 // CRUD básico (solo para gestión administrativa)
-router.post('/', authenticateToken, requireAdmin, createCart);
-router.get('/admin/:cartId', authenticateToken, requireAdmin, getCart);
-router.put('/admin/:cartId', authenticateToken, requireAdmin, updateCart);
-router.delete('/admin/:cartId', authenticateToken, requireAdmin, deleteCart);
-router.get('/admin', authenticateToken, requireAdmin, getAllCarts);
+router.post('/', authenticateToken, admin, createCart);
+router.get('/admin/:cartId', authenticateToken, admin, getCart);
+router.put('/admin/:cartId', authenticateToken, admin, updateCart);
+router.delete('/admin/:cartId', authenticateToken, admin, deleteCart);
+router.get('/admin', authenticateToken, admin, getAllCarts);
 
 // Gestión de items (solo para gestión administrativa)
-router.post('/admin/:cartId/items', authenticateToken, requireAdmin, addItemToCart);
-router.put('/admin/:cartId/items/:productId', authenticateToken, requireAdmin, updateItemQuantity);
-router.delete('/admin/:cartId/items/:productId', authenticateToken, requireAdmin, removeItemFromCart);
-router.delete('/admin/:cartId/clear', authenticateToken, requireAdmin, clearCart);
+router.post('/admin/:cartId/items', authenticateToken, admin, addItemToCart);
+router.put('/admin/:cartId/items/:productId', authenticateToken, admin, updateItemQuantity);
+router.delete('/admin/:cartId/items/:productId', authenticateToken, admin, removeItemFromCart);
+router.delete('/admin/:cartId/clear', authenticateToken, admin, clearCart);
 
 // Cálculos y totales (solo para gestión administrativa)
-router.get('/admin/:cartId/totals', authenticateToken, requireAdmin, calculateCartTotals);
-router.get('/admin/:cartId/summary', authenticateToken, requireAdmin, getCartSummary);
-router.get('/admin/:cartId/availability', authenticateToken, requireAdmin, checkCartAvailability);
+router.get('/admin/:cartId/totals', authenticateToken, admin, calculateCartTotals);
+router.get('/admin/:cartId/summary', authenticateToken, admin, getCartSummary);
+router.get('/admin/:cartId/availability', authenticateToken, admin, checkCartAvailability);
 
 export default router; 

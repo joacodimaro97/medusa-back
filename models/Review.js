@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const reviewSchema = new mongoose.Schema({
   productId: {
@@ -22,6 +23,23 @@ const reviewSchema = new mongoose.Schema({
     required: [true, 'El comentario es requerido'],
     trim: true,
     maxlength: [500, 'El comentario no puede tener más de 500 caracteres']
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
+  moderationReason: {
+    type: String,
+    trim: true,
+    maxlength: [200, 'La razón de moderación no puede tener más de 200 caracteres']
+  },
+  moderatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  moderatedAt: {
+    type: Date
   }
 }, {
   timestamps: { 
@@ -81,5 +99,10 @@ reviewSchema.index({ productId: 1 });
 reviewSchema.index({ userId: 1 });
 reviewSchema.index({ rating: 1 });
 reviewSchema.index({ createdAt: -1 });
+reviewSchema.index({ status: 1 });
+reviewSchema.index({ moderatedBy: 1 });
+
+// Plugin de paginación
+reviewSchema.plugin(mongoosePaginate);
 
 export default mongoose.model('Review', reviewSchema); 

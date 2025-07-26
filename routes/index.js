@@ -14,7 +14,8 @@ router.get('/', (req, res) => {
       auth: '/auth',
       categories: '/categories',
       cart: '/cart',
-      orders: '/orders'
+      orders: '/orders',
+      reviews: '/reviews'
     }
   });
 });
